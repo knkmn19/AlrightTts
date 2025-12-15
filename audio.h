@@ -29,11 +29,11 @@ struct audio_engine {
  * NULL sentinel
  */
 error audio_putdrivermeta(struct audio_drivermeta const**);
-error audio_freedrivermeta(struct audio_drivermeta const**);
+void audio_freedrivermeta(struct audio_drivermeta const**);
 
 error audio_createenginewith(
     struct audio_drivermeta const, struct audio_engine**
 );
-error audio_destroyengine(struct audio_engine*);
+void audio_destroyengine(struct audio_engine*);
 
 #endif /* !ALRTTS_AUDIO */
