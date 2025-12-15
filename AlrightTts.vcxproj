@@ -130,6 +130,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AlrightTts.cpp" />
+    <ClCompile Include="audio_stub.c" />
+    <ClCompile Include="tts_stub.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include=".editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="annotations.h" />
+    <ClInclude Include="audio.h" />
+    <ClInclude Include="error.h" />
+    <ClInclude Include="tts.h" />
+    <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
