@@ -130,7 +130,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AlrightTts.cpp" />
-    <ClCompile Include="audio_stub.c" />
     <ClCompile Include="audio_wasapi.cpp" />
     <ClCompile Include="tts_stub.c" />
   </ItemGroup>
@@ -145,6 +144,7 @@
     <ClInclude Include="annotations.h" />
     <ClInclude Include="audio.h" />
     <ClInclude Include="error.h" />
+    <ClInclude Include="expected.hpp" />
     <ClInclude Include="scopeexit.hpp" />
     <ClInclude Include="tts.h" />
     <ClInclude Include="types.h" />
