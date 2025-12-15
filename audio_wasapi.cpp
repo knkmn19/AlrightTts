@@ -17,6 +17,11 @@ extern "C++" {
 
 namespace {
 
+    using MM_DEVICE_ENUMERATOR    = IMMDeviceEnumerator;
+    using MM_DEVICE               = IMMDevice;
+    using WAS_AUDIO_CLIENT        = IAudioClient;
+    using WAS_AUDIO_RENDER_CLIENT = IAudioRenderClient;
+
     struct ENGINE final {
         audio_engine engine;
     };
