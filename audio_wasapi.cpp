@@ -164,18 +164,28 @@ namespace wasapi {
 
     error audio_putdrivermeta(audio_drivermeta const** ptrdms)
     {
-        HRESULT hr;
+        /* set up com */ {
+            HRESULT hr;
 
-        /*
-         * setup com here for now
-         */
-        hr = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
-        if FAILED(hr)
-            return ::error_errorfromhr(hr);
+            hr = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
+            if FAILED(hr)
+                return ::error_errorfromhr(hr);
+        }
 
+        auto enumerator = ::createdeviceenumerator();
+        if (!enumerator)
+            return enumerator.Error();
 
+        auto seEnumerator = ScopeExit(
+            [&enumerator](void) -> void
+                { (*enumerator)->Release(); }
+        );
 
-        *ptrdms = NULL;
+        auto metas = ::enumerateendpoints(*enumerator);
+        if (!metas)
+            return metas.Error();
+
+        *ptrdms = *metas;
         return error_ok;
     }
 
