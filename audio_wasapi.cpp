@@ -32,6 +32,17 @@ namespace {
 
     error audio_putdrivermeta(audio_drivermeta const** ptrdms)
     {
+        HRESULT hr;
+
+        /*
+         * setup com here for now
+         */
+        hr = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+
+
+
         *ptrdms = NULL;
         return error_ok;
     }
@@ -56,6 +67,12 @@ namespace {
     }
 
     void audio_destroyengine(audio_engine* a)
-        { (void)a; }
+    {
+        (void)a;
+        /*
+         * and uninit com here
+         */
+        ::CoUninitialize();
+    }
 
 } // extern "C"
