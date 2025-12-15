@@ -1,0 +1,8 @@
+# default
+* text=auto
+
+# dont track external dependancies
+**/external/** -diff merge=binary
+
+# linguist
+*.h linguist-language=C

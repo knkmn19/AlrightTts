@@ -1,0 +1,19 @@
+# development
+*.err
+*.swp
+*.vcxproj.filters
+*dump*
+
+# vs generated (dev and compiled
+.vs/
+*.user
+x64/
+x86/
+enc_temp_folder/
+
+# misc and other bin
+*.obj
+*.dll
+*.zip
+*.html
+*.wav
