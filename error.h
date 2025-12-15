@@ -33,5 +33,15 @@ static inline char const* error_what(error e)
 
     return "idk";
 }
+static inline error error_errorfromhr(long hr)
+{
+    switch (hr) {
+    default:
+        break;
+
+
+    }
+    return error_fail;
+}
 
 #endif /* !ALRTTS_ERROR */
