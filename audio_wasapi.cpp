@@ -21,6 +21,8 @@ extern "C++" {
 
 namespace {
 
+namespace wasapi {
+
     using MM_DEVICE_ENUMERATOR    = IMMDeviceEnumerator;
     using MM_DEVICE               = IMMDevice;
     using WAS_AUDIO_CLIENT        = IAudioClient;
@@ -40,6 +42,8 @@ namespace {
 
     FN_NOTIMPLEMENTED_PRIORITYMAX
     Expected<audio_drivermeta, error> dmfromdevice(MM_DEVICE*);
+
+} // wasapi
 
 } // {unnamed}
 
