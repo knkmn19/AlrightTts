@@ -38,6 +38,9 @@ namespace {
         MM_DEVICE_ENUMERATOR*
     );
 
+    FN_NOTIMPLEMENTED_PRIORITYMAX
+    Expected<audio_drivermeta, error> dmfromdevice(MM_DEVICE*);
+
 } // {unnamed}
 
 } // extern "C++"
