@@ -172,7 +172,7 @@ namespace wasapi {
                 return ::error_errorfromhr(hr);
         }
 
-        auto enumerator = ::createdeviceenumerator();
+        auto enumerator = wasapi::createdeviceenumerator();
         if (!enumerator)
             return enumerator.Error();
 
@@ -181,7 +181,7 @@ namespace wasapi {
                 { (*enumerator)->Release(); }
         );
 
-        auto metas = ::enumerateendpoints(*enumerator);
+        auto metas = wasapi::enumerateendpoints(*enumerator);
         if (!metas)
             return metas.Error();
 
