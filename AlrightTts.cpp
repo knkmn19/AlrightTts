@@ -30,7 +30,7 @@ int main(int, char** vector)
             { ::audio_freedrivermeta(&metas); }
     );
 
-    for (size_t i = 0; (metas + i) != nullptr; i++) {
+    for (size_t i = 0; (metas + i)->driver != nullptr; i++) {
         auto const* dm = (metas + i);
         std::cout << dm->name << std::endl;
     }

@@ -26,7 +26,7 @@ struct audio_engine {
 };
 
 /*
- * NULL sentinel
+ * sentinel terminated by (audio_drivermeta::driver == NULL)
  */
 error audio_putdrivermeta(struct audio_drivermeta const**);
 void audio_freedrivermeta(struct audio_drivermeta const**);
