@@ -6,3 +6,4 @@
 
 # linguist
 *.h linguist-language=C
+**/external/** linguist-vendored
