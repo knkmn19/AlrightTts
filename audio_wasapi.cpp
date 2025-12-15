@@ -5,6 +5,8 @@ extern "C" {
 
     #include "audio.h"
 
+    #include "annotations.h"
+
 extern "C++" {
 
     #pragma comment(lib, "Avrt.lib")
@@ -14,6 +16,8 @@ extern "C++" {
     #include <audioclient.h>
     #include <avrt.h>
     #include <Functiondiscoverykeys_devpkey.h>
+
+    #include "expected.hpp"
 
 namespace {
 
@@ -25,6 +29,14 @@ namespace {
     struct ENGINE final {
         audio_engine engine;
     };
+
+    FN_NOTIMPLEMENTED_PRIORITYMAX
+    Expected<MM_DEVICE_ENUMERATOR*, error> createdeviceenumerator(void);
+
+    FN_NOTIMPLEMENTED_PRIORITYMAX
+    Expected<audio_drivermeta const*, error> enumerateendpoints(
+        MM_DEVICE_ENUMERATOR*
+    );
 
 } // {unnamed}
 
