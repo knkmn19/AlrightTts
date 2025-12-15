@@ -1,11 +1,43 @@
 // AlrightTts.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
+extern "C" {
+    #include "audio.h"
+    #include "tts.h"
+} // extern "C"
 
-int main()
+#include <iostream>
+#include "scopeexit.hpp"
+
+int main(int, char** vector)
 {
+    (void)vector;
+
+    if (auto e = ::tts_init())
+        return (std::cout << ::error_what(e) << std::endl, e);
+
+    auto seTts = ScopeExit(
+        [](void) -> void
+            { ::tts_destroy(); }
+    );
+
+    audio_drivermeta const* metas;
+    if (auto e = ::audio_putdrivermeta(&metas))
+        return (std::cout << ::error_what(e) << std::endl, e);
+
+    auto seDm = ScopeExit(
+        [&metas](void) -> void
+            { ::audio_freedrivermeta(&metas); }
+    );
+
+    for (size_t i = 0; (metas + i) != nullptr; i++) {
+        auto const* dm = (metas + i);
+        std::cout << dm->name << std::endl;
+    }
+
     std::cout << "Hello World!\n";
+
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
