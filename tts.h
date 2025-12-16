@@ -12,6 +12,13 @@
 #include "error.h"
 #include "types.h"
 
+struct tts_engine {
+    unsigned : 0;
+    /*
+     * rest oif the layout is impl defined
+     */
+};
+
 struct tts_pcmdesc {
     byte_t* buf;
     size_t sz;
