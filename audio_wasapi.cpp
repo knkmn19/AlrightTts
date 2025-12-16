@@ -203,8 +203,8 @@ namespace wasapi {
 
     void audio_freedrivermeta(struct audio_drivermeta const* dms)
     {
-        (void)dms;
-        ;
+        if (auto* p = dms)
+            delete[] p;
     }
 
     error audio_createenginewith(
