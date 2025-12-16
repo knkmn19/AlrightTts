@@ -37,6 +37,7 @@ static int setupaudio(audio_engine*&);
  * continue
  */
 static int startkernel(audio_engine*);
+static std::string strfrominbuf(void);
 
 /*
  * clean up
@@ -88,24 +89,33 @@ static int setupaudio(audio_engine*& ptra)
     return 0;
 }
 
+static std::string strfrominbuf(void)
+{
+    std::string in;
+    in.clear();
+
+    for (;;) {
+        byte_t c;
+        while ((c = std::getchar()) != '\n')
+            in += c;
+
+        if (in.length() > 0u)
+            break;
+    }
+
+    return in;
+}
+
 static int startkernel(audio_engine* a)
 {
     error e;
 
-    std::string in;
-    byte_t c;
     for (;;) {
-        in.clear();
-
         bool bSigint = false;
         if (bSigint)
             break;
 
-        while ((c = std::getchar()) != '\n')
-            in += c;
-
-        if (in.length() == 0u)
-            continue;
+        std::string in = ::strfrominbuf();
 
         tts_pcmdesc d = { };
         if (e = ::tts_pcmfromutf8(in.c_str(), &d))
