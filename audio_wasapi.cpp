@@ -389,6 +389,11 @@ namespace wasapi {
             return ::error_errorfromhr(hr);
 
         WAVEFORMATEXTENSIBLE wfe = wasapi::preferredmixformatof(o);
+        assert(wfe.Format.nChannels == 2u);
+        assert(wfe.Format.nSamplesPerSec == 48000u);
+        assert(wfe.Samples.wSamplesPerBlock == 32u);
+        assert(wfe.SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
+
         hr = o->Initialize(
             AUDCLNT_SHAREMODE_SHARED,
             AUDCLNT_STREAMFLAGS_EVENTCALLBACK, 0, 0, &wfe.Format,
