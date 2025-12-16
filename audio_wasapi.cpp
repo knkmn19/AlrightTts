@@ -191,8 +191,18 @@ namespace wasapi {
             {
                 ::memset(packet, 0x00, szPacket);
                 if (bPlaying) {
-                    ;
-                    ;
+                    audio_engine& engine = this->engine;
+                    size_t const szWrite = (
+                        (szPacket < engine.szbufread) ?
+                        (szPacket) : (engine.szbufread)
+                    );
+
+                    ::memcpy(packet, engine.bufread, szWrite);
+                    engine.bufread += szWrite;
+                    engine.szbufread -= szWrite;
+
+                    if (engine.szbufread == 0)
+                        engine.bplaying = false;
                 }
             }
             hr = this->renderclient->ReleaseBuffer(szPacket, 0);
