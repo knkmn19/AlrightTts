@@ -143,7 +143,10 @@ static int startkernel(audio_engine* a)
 }
 
 static void uninit(void)
-    { ; }
+{
+    ::tts_uninit();
+    ::audio_uninit();
+}
 
 int main(int, char** vector)
 {
@@ -162,6 +165,11 @@ int main(int, char** vector)
     audio_engine* a;
     if (o = ::setupaudio(a))
         return o;
+
+    auto seAudio = ScopeExit(
+        [&a](void) -> void
+            { ::audio_destroyengine(a); }
+    );
 
     if (o = ::startkernel(a))
         return o;
