@@ -61,6 +61,8 @@ namespace wasapi {
 
     Expected<audio_drivermeta, error> dmfromdevice(MM_DEVICE*);
 
+    Expected<MM_DEVICE*, error> createdevice(LPCWSTR guid);
+
 } // wasapi
 
     /*
@@ -221,6 +223,28 @@ namespace wasapi {
 
         return o;
     }
+
+    Expected<MM_DEVICE*, error> wasapi::createdevice(LPCWSTR guid)
+    {
+        HRESULT hr;
+        MM_DEVICE* o;
+
+        auto enumerator = wasapi::createdeviceenumerator();
+        if (!enumerator)
+            return enumerator.Error();
+
+        auto seEnumerator = ScopeExit(
+            [&enumerator](void) -> void
+                { (*enumerator)->Release(); }
+        );
+
+        hr = (*enumerator)->GetDevice(guid, &o);
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+
+        return o;
+    }
+
 
 } // {unnamed}
 
