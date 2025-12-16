@@ -10,8 +10,10 @@ extern "C" {
 extern "C++" {
 
     #pragma comment(lib, "Avrt.lib")
+    #pragma comment(lib, "Synchronization.lib")
 
     #include <windows.h>
+    #include <process.h>
     #include <mmdeviceapi.h>
     #include <audioclient.h>
     #include <avrt.h>
@@ -32,8 +34,16 @@ namespace wasapi {
 
     struct ENGINE final {
         audio_engine engine;
-    };
 
+        error errorThrd;
+        uintptr_t thrdAudio;
+
+        FN_NOTIMPLEMENTED_PRIORITYMAX
+        void static main(void* engine);
+
+        FN_NOTIMPLEMENTED_PRIORITYMAX
+        error Initialize(audio_drivermeta const&);
+    };
 
     struct ENDPOINTS_METADATA final {
         audio_drivermeta* metas;
