@@ -110,6 +110,8 @@ static int startkernel(audio_engine* a)
 {
     error e;
 
+    tts_pcmdesc dPrev = { };
+    dPrev.buf = nullptr;
     for (;;) {
         bool bSigint = false;
         if (bSigint)
@@ -126,9 +128,15 @@ static int startkernel(audio_engine* a)
          */
         while (a->bplaying)
             ;
+
+        if (dPrev.buf != nullptr)
+            ::tts_freepcm(dPrev);
+
         a->szbufread = d.sz;
         a->bufread = d.buf;
         a->bplaying = true;
+
+        dPrev = d;
     }
 
     return 0;
