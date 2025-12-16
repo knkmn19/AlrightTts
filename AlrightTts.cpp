@@ -115,12 +115,10 @@ static int startkernel(audio_engine* a)
          * its aligned but should still mmake it clear this is an atomic loadd
          */
         while (a->bplaying)
-            /* o yield or pause yet */;
+            ;
         a->szbufread = d.sz;
         a->bufread = d.buf;
         a->bplaying = true;
-
-        std::cout << in << std::endl;
     }
 
     return 0;
