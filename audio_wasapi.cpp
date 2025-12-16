@@ -94,7 +94,7 @@ namespace wasapi {
     void wasapi::ENGINE::main(void* p)
     {
         error e;
-        auto& engine = **static_cast<wasapi::ENGINE**>(p);
+        auto& engine = *static_cast<wasapi::ENGINE*>(p);
 
         auto seWriteE = ScopeExit(
             [&engine, e](void) -> void
@@ -151,8 +151,7 @@ namespace wasapi {
         this->errorThrd = error_unset;
         this->engine.drivermeta = dm;
 
-        ENGINE* me = this;
-        if (::_beginthread(ENGINE::main, 0, &me) == -1L)
+        if (::_beginthread(ENGINE::main, 0, this) == -1L)
             return error_badalloc;
 
         error errorStale = error_unset;
