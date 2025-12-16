@@ -37,10 +37,14 @@ namespace wasapi {
     using WAS_AUDIO_RENDER_CLIENT = IAudioRenderClient;
 
     struct ENGINE final {
-        audio_engine engine;
+        audio_engine mutable engine;
 
         error errorThrd;
         uintptr_t thrdAudio;
+        /*
+         * prefer bool_t cause 4 bytes is easier to align than 1
+         */
+        bool_t mutable bShouldExit;
 
         WAS_AUDIO_CLIENT* client;
         HANDLE eventCallback;
@@ -49,6 +53,7 @@ namespace wasapi {
         FN_NOTIMPLEMENTED_PRIORITYMAX
         void static main(void* engine);
         error SetupClient(void);
+        error Mix(void) const;
 
         FN_NOTIMPLEMENTED_PRIORITYMAX
         error Initialize(audio_drivermeta const&);
@@ -108,6 +113,9 @@ namespace wasapi {
             [&engine](void) -> void
                 { (void)engine.client->Stop(); }
         );
+
+        if (e = engine.Mix())
+            return;
     }
 
     error wasapi::ENGINE::SetupClient(void)
@@ -143,6 +151,12 @@ namespace wasapi {
         this->renderclient = *renderclient;
 
         seEvent.Cancel();
+        return error_ok;
+    }
+
+    error wasapi::ENGINE::Mix(void) const
+    {
+
         return error_ok;
     }
 
