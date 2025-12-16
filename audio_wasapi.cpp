@@ -25,6 +25,9 @@ extern "C++" {
 
 namespace {
 
+    template<typename T>
+    void writeandwake(T& where, T const);
+
 namespace wasapi {
 
     using MM_DEVICE_ENUMERATOR    = IMMDeviceEnumerator;
@@ -65,11 +68,17 @@ namespace wasapi {
      */
     using namespace wasapi;
 
+    template<typename T>
+    void writeandwake(T& where, T const v)
+    {
+        where = v;
+        ::WakeByAddressSingle(&where);
+    }
+
     void wasapi::ENGINE::main(void* p)
     {
         auto& engine = **static_cast<wasapi::ENGINE**>(p);
-        engine.errorThrd = error_fail;
-        ::WakeByAddressSingle(&engine.errorThrd);
+        ::writeandwake(engine.errorThrd, error_fail);
     }
 
     error wasapi::ENGINE::Initialize(audio_drivermeta const& dm)
