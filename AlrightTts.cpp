@@ -19,7 +19,7 @@ static int init(void);
  * ask for which one(s
  * create audio engine
  */
-static int setupaudio(void);
+static int setupaudio(audio_engine*&);
 
 /*
  * wait for input ending with \n
@@ -50,8 +50,42 @@ ret:
     return e;
 }
 
-static int setupaudio(void)
-    { return 0; }
+static int setupaudio(audio_engine*& ptra)
+{
+    error e;
+
+    audio_engine* o;
+
+    audio_drivermeta const* metas;
+    size_t noMeta;
+
+    size_t iSelected;
+
+    auto seDm = ScopeExit(
+        [&metas](void) -> void
+            { ::audio_freedrivermeta(metas); }
+    );
+
+    if (e = ::audio_putdrivermeta(&metas, &noMeta))
+        goto ret;
+
+    std::cout << "pick one from" << std::endl;
+    for (size_t i = 0; i < noMeta; i++) {
+        audio_drivermeta const& dm = metas[i];
+        std::cout << "[" << i << "] - " << dm.name << std::endl;
+    }
+
+    iSelected = noMeta;
+    while (iSelected >= noMeta)
+        iSelected = (std::getchar() - '0');
+
+    if (e = ::audio_createenginewith(metas[iSelected], &o))
+        goto ret;
+
+ret:
+    std::cerr << "setup : " << ::error_what(e) << std::endl;
+    return e;
+}
 
 static int startkernel(void)
     { return 0; }
@@ -73,7 +107,8 @@ int main(int, char** vector)
             { ::uninit(); }
     );
 
-    if (o = ::setupaudio())
+    audio_engine* a;
+    if (o = ::setupaudio(a))
         return o;
 
     if (o = ::startkernel())
