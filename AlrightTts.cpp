@@ -7,6 +7,7 @@ extern "C" {
 } // extern "C"
 
 #include <iostream>
+#include <string>
 #include "scopeexit.hpp"
 
 inline static error printerror(char const* where, error e)
@@ -35,7 +36,7 @@ static int setupaudio(audio_engine*&);
  * set pcm in audio
  * continue
  */
-static int startkernel(void);
+static int startkernel(audio_engine*);
 
 /*
  * clean up
@@ -86,8 +87,40 @@ static int setupaudio(audio_engine*& ptra)
     return 0;
 }
 
-static int startkernel(void)
-    { return 0; }
+static int startkernel(audio_engine* a)
+{
+    error e;
+
+    std::string in;
+    byte_t c;
+    for (;;) {
+        in.clear();
+
+        bool bSigint = false;
+        if (bSigint)
+            break;
+
+        while ((c = std::getchar()) != '\n')
+            in += c;
+
+        tts_pcmdesc d = { };
+        if (e = ::tts_pcmfromutf8(in.c_str(), &d))
+            return ::printerror("kernel", e);
+
+        /*
+         * its aligned but should still mmake it clear this is an atomic loadd
+         */
+        while (a->bplaying)
+            /* o yield or pause yet */;
+        a->szbufread = d.sz;
+        a->bufread = d.buf;
+        a->bplaying = true;
+
+        std::cout << in << std::endl;
+    }
+
+    return 0;
+}
 
 static void uninit(void)
     { ; }
@@ -110,7 +143,7 @@ int main(int, char** vector)
     if (o = ::setupaudio(a))
         return o;
 
-    if (o = ::startkernel())
+    if (o = ::startkernel(a))
         return o;
 
     std::cout << "Hello World!\n";
