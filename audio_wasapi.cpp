@@ -42,8 +42,13 @@ namespace wasapi {
         error errorThrd;
         uintptr_t thrdAudio;
 
+        WAS_AUDIO_CLIENT* client;
+        HANDLE eventCallback;
+        WAS_AUDIO_RENDER_CLIENT* renderclient;
+
         FN_NOTIMPLEMENTED_PRIORITYMAX
         void static main(void* engine);
+        error SetupClient(void);
 
         FN_NOTIMPLEMENTED_PRIORITYMAX
         error Initialize(audio_drivermeta const&);
@@ -88,13 +93,63 @@ namespace wasapi {
 
     void wasapi::ENGINE::main(void* p)
     {
+        error e;
         auto& engine = **static_cast<wasapi::ENGINE**>(p);
-        ::writeandwake(engine.errorThrd, error_fail);
+
+        auto seWriteE = ScopeExit(
+            [&engine, e](void) -> void
+                { ::writeandwake(engine.errorThrd, e); }
+        );
+
+        if (e = engine.SetupClient())
+            return;
+
+        auto seStop = ScopeExit(
+            [&engine](void) -> void
+                { (void)engine.client->Stop(); }
+        );
+    }
+
+    error wasapi::ENGINE::SetupClient(void)
+    {
+        auto guidDevice = static_cast<LPCWSTR>(this->engine.drivermeta.driver);
+        auto device = wasapi::createdevice(guidDevice);
+        if (!device)
+            return device.Error();
+
+        auto seDevice = ScopeExit(
+            [&device](void) -> void
+                { (*device)->Release(); }
+        );
+
+        HANDLE event = ::CreateEvent(nullptr, false, false, nullptr);
+        if (event == NULL)
+            return ::error_errorfromhr(::HRESULT_FROM_WIN32(::GetLastError()));
+        this->eventCallback = event;
+
+        auto seEvent = ScopeExit(
+            [&event](void) -> void
+                { ::CloseHandle(event); }
+        );
+
+        auto client = wasapi::createclient(*device, event);
+        if (!client)
+            return client.Error();
+        this->client = *client;
+
+        auto renderclient = wasapi::queryrenderclientfrom(*client);
+        if (!renderclient)
+            return renderclient.Error();
+        this->renderclient = *renderclient;
+
+        seEvent.Cancel();
+        return error_ok;
     }
 
     error wasapi::ENGINE::Initialize(audio_drivermeta const& dm)
     {
         this->errorThrd = error_unset;
+        this->engine.drivermeta = dm;
 
         ENGINE* me = this;
         if (::_beginthread(ENGINE::main, 0, &me) == -1L)
