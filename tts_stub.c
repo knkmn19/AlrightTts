@@ -6,7 +6,7 @@
 error tts_init(void)
     { return error_ok; }
 
-void tts_destroy(void)
+void tts_uninit(void)
     { ; }
 
 error tts_pcmfromutf8(char const* s, struct tts_pcmdesc* ptrd)

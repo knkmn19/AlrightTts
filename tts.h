@@ -23,7 +23,7 @@ struct tts_pcmdesc {
 };
 
 error tts_init(void);
-void tts_destroy(void);
+void tts_uninit(void);
 
 error tts_pcmfromutf8(char const*, struct tts_pcmdesc*);
 void tts_freepcm(struct tts_pcmdesc const);
