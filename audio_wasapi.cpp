@@ -20,6 +20,7 @@ extern "C++" {
     #include <Functiondiscoverykeys_devpkey.h>
 
     #include <new>
+    #include <cassert>
     #include "expected.hpp"
     #include "scopeexit.hpp"
 
@@ -62,6 +63,10 @@ namespace wasapi {
     Expected<audio_drivermeta, error> dmfromdevice(MM_DEVICE*);
 
     Expected<MM_DEVICE*, error> createdevice(LPCWSTR guid);
+
+    Expected<WAS_AUDIO_CLIENT*, error> createclient(MM_DEVICE*);
+
+    WAVEFORMATEXTENSIBLE preferredmixformatof(WAS_AUDIO_CLIENT*);
 
 } // wasapi
 
@@ -245,6 +250,51 @@ namespace wasapi {
         return o;
     }
 
+    Expected<WAS_AUDIO_CLIENT*, error> wasapi::createclient(MM_DEVICE* device)
+    {
+        HRESULT hr;
+        WAS_AUDIO_CLIENT* o;
+
+        hr = device->Activate(
+            __uuidof(*o), CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&o)
+        );
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+
+        WAVEFORMATEXTENSIBLE wfe = wasapi::preferredmixformatof(o);
+        hr = o->Initialize(
+            AUDCLNT_SHAREMODE_SHARED,
+            AUDCLNT_STREAMFLAGS_EVENTCALLBACK, 0, 0, &wfe.Format,
+            NULL
+        );
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+
+        return o;
+    }
+
+    WAVEFORMATEXTENSIBLE wasapi::preferredmixformatof(WAS_AUDIO_CLIENT* client)
+    {
+        HRESULT hr;
+        WAVEFORMATEXTENSIBLE o = { };
+
+        WAVEFORMATEX* wf;
+        hr = client->GetMixFormat(&wf);
+        if FAILED(hr)
+            /*
+             * we arent really gonna handle an error (its really unlikely
+             */
+            return (assert(false), o);
+
+        if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+            o = *reinterpret_cast<WAVEFORMATEXTENSIBLE*>(wf);
+        else
+            o.Format = *wf;
+
+        ::CoTaskMemFree(wf);
+
+        return o;
+    }
 
 } // {unnamed}
 
