@@ -12,19 +12,19 @@
 #include "error.h"
 #include "types.h"
 
-typedef enum {
-    tts_pcmformat_int16,
-} tts_pcmformat;
-
 struct tts_pcmdesc {
     byte_t* buf;
     size_t sz;
-    tts_pcmformat format;
 };
 
 error tts_init(void);
 void tts_uninit(void);
 
+/*
+ * freq     : 48000 hz
+ * bitdepth : float32
+ * channels : 2
+ */
 error tts_pcmfromutf8(char const*, struct tts_pcmdesc*);
 void tts_freepcm(struct tts_pcmdesc const);
 
