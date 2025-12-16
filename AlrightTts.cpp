@@ -9,6 +9,12 @@ extern "C" {
 #include <iostream>
 #include "scopeexit.hpp"
 
+inline static error printerror(char const* where, error e)
+{
+    std::cerr << where << " : " << ::error_what(e) << std::endl;
+    return e;
+}
+
 /*
  * init audio and tts subsystems
  */
@@ -40,14 +46,12 @@ static int init(void)
 {
     error e;
     if (e = ::audio_init())
-        goto ret;
+        return ::printerror("init", e);
 
     if (e = ::tts_init())
-        goto ret;
+        return ::printerror("init", e);
 
-ret:
-    std::cerr << "init : " << ::error_what(e) << std::endl;
-    return e;
+    return 0;
 }
 
 static int setupaudio(audio_engine*& ptra)
@@ -58,16 +62,13 @@ static int setupaudio(audio_engine*& ptra)
 
     audio_drivermeta const* metas;
     size_t noMeta;
-
-    size_t iSelected;
+    if (e = ::audio_putdrivermeta(&metas, &noMeta))
+        return ::printerror("setup", e);
 
     auto seDm = ScopeExit(
         [&metas](void) -> void
             { ::audio_freedrivermeta(metas); }
     );
-
-    if (e = ::audio_putdrivermeta(&metas, &noMeta))
-        goto ret;
 
     std::cout << "pick one from" << std::endl;
     for (size_t i = 0; i < noMeta; i++) {
@@ -75,16 +76,14 @@ static int setupaudio(audio_engine*& ptra)
         std::cout << "[" << i << "] - " << dm.name << std::endl;
     }
 
-    iSelected = noMeta;
+    size_t iSelected = noMeta;
     while (iSelected >= noMeta)
         iSelected = (std::getchar() - '0');
 
     if (e = ::audio_createenginewith(metas[iSelected], &o))
-        goto ret;
+        return ::printerror("setup", e);
 
-ret:
-    std::cerr << "setup : " << ::error_what(e) << std::endl;
-    return e;
+    return 0;
 }
 
 static int startkernel(void)
