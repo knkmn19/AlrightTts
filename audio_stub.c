@@ -7,6 +7,12 @@ struct audio_stub_engine {
     struct audio_engine engine;
 };
 
+error audio_init(void)
+    { return error_ok; }
+
+void audio_destroy(void)
+    { ; }
+
 error audio_putdrivermeta(struct audio_drivermeta const** ptrdms)
 {
     *ptrdms = NULL;

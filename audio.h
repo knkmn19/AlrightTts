@@ -25,6 +25,9 @@ struct audio_engine {
      */
 };
 
+error audio_init(void);
+void audio_uninit(void);
+
 /*
  * sentinel terminated by (audio_drivermeta::driver == NULL)
  */
