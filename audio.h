@@ -28,11 +28,8 @@ struct audio_engine {
 error audio_init(void);
 void audio_uninit(void);
 
-/*
- * sentinel terminated by (audio_drivermeta::driver == NULL)
- */
-error audio_putdrivermeta(struct audio_drivermeta const**);
-void audio_freedrivermeta(struct audio_drivermeta const**);
+error audio_putdrivermeta(struct audio_drivermeta const**, size_t* no);
+void audio_freedrivermeta(struct audio_drivermeta const*);
 
 error audio_createenginewith(
     struct audio_drivermeta const, struct audio_engine**
