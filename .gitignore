@@ -17,3 +17,8 @@ enc_temp_folder/
 *.zip
 *.html
 *.wav
+*.lib
+
+# voicevox
+models/
+open_jtalk_*/
