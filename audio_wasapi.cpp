@@ -17,6 +17,7 @@ extern "C++" {
     #include <avrt.h>
     #include <Functiondiscoverykeys_devpkey.h>
 
+    #include <new>
     #include "expected.hpp"
     #include "scopeexit.hpp"
 
@@ -99,7 +100,9 @@ namespace wasapi {
             }
         );
 
-        audio_drivermeta* metas = new audio_drivermeta[no];
+        auto* metas = new (std::nothrow) audio_drivermeta[no];
+        if (metas == nullptr)
+            return error_badalloc;
         ::memset(metas, 0x00, (no * (sizeof * metas)));
 
         auto seDm = ScopeExit(
