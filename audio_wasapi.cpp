@@ -97,7 +97,7 @@ namespace wasapi {
         auto& engine = *static_cast<wasapi::ENGINE*>(p);
 
         auto seWriteE = ScopeExit(
-            [&engine, e](void) -> void
+            [&engine, &e](void) -> void
                 { ::writeandwake(engine.errorThrd, e); }
         );
 
@@ -457,6 +457,7 @@ namespace wasapi {
         if (e = o->Initialize(dm))
             return e;
 
+        seDestroy.Cancel();
         *ptra = reinterpret_cast<audio_engine*>(o);
         return error_ok;
     }
