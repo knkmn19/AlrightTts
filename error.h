@@ -13,6 +13,9 @@ typedef enum error {
     error_ok    = 0,
     error_fail  = 1,
     error_unset = 2,
+
+    error_reserved = 999,
+    error_badalloc,
 } error;
 
 static inline char const* error_what(error e)
@@ -20,6 +23,9 @@ static inline char const* error_what(error e)
     switch (e) {
     default:
         break;
+
+    case error_badalloc:
+        return "mem allocation fail...........";
 
     case error_unset:
         return "result isnt ready yet bro";
