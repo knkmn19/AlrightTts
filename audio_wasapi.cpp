@@ -53,9 +53,9 @@ namespace wasapi {
         FN_NOTIMPLEMENTED_PRIORITYMAX
         void static main(void* engine);
         error SetupClient(void);
+        FN_NOTIMPLEMENTED_PRIORITYMAX
         error Mix(void) const;
 
-        FN_NOTIMPLEMENTED_PRIORITYMAX
         error Initialize(audio_drivermeta const&);
     };
 
@@ -156,6 +156,49 @@ namespace wasapi {
 
     error wasapi::ENGINE::Mix(void) const
     {
+        HRESULT hr;
+
+        UINT32 register szBuf;
+        hr = this->client->GetBufferSize(&szBuf);
+        if (FAILED(hr))
+            return ::error_errorfromhr(hr);
+
+        for (;;) {
+            bool const bExit = ::InterlockedCompareExchange(
+                reinterpret_cast<dword_t*>(&this->bShouldExit), 0u, 0u
+            );
+            if CMP_UNLIKELY (bExit)
+                break;
+
+            ::WaitForSingleObject(this->eventCallback, INFINITE);
+            bool const bSilence = !::InterlockedCompareExchange(
+                reinterpret_cast<dword_t*>(&this->engine.bplaying), 0u, 0u
+            );
+
+            UINT32 pad;
+            hr = this->client->GetCurrentPadding(&pad);
+            if CMP_UNLIKELY (FAILED(hr))
+                return ::error_errorfromhr(hr);
+
+            size_t const szPacket = (szBuf - pad);
+            if CMP_UNLIKELY (szPacket == 0)
+                continue;
+
+            DWORD silent = ((bSilence) ? (AUDCLNT_BUFFERFLAGS_SILENT) : (0));
+            byte_t* packet;
+            hr = this->renderclient->GetBuffer(szPacket, &packet);
+            if CMP_UNLIKELY (FAILED(hr))
+                return ::error_errorfromhr(hr);
+            {
+                if (!silent) {
+                    ;
+                    ;
+                }
+            }
+            hr = this->renderclient->ReleaseBuffer(szPacket, silent);
+            if CMP_UNLIKELY (FAILED(hr))
+                return ::error_errorfromhr(hr);
+        }
 
         return error_ok;
     }
