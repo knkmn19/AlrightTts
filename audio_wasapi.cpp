@@ -214,14 +214,20 @@ namespace wasapi {
         audio_drivermeta const dm, audio_engine** ptra
     )
     {
-        (void)dm, (void)ptra;
-        return error_fail;
+        (void)dm;
+
+        auto* o = new (std::nothrow) wasapi::ENGINE;
+        if (o == nullptr)
+            return error_badalloc;
+
+        *ptra = reinterpret_cast<audio_engine*>(o);
+        return error_ok;
     }
 
     void audio_destroyengine(audio_engine* a)
     {
-        (void)a;
-        ;
+        if (auto* p = reinterpret_cast<wasapi::ENGINE*>(a))
+            delete a;
     }
 
 } // extern "C"
