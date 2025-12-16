@@ -33,11 +33,17 @@ namespace wasapi {
         audio_engine engine;
     };
 
+
+    struct ENDPOINTS_METADATA final {
+        audio_drivermeta* metas;
+        size_t noMetas;
+    };
+
     FN_NOTIMPLEMENTED_PRIORITYMAX
     Expected<MM_DEVICE_ENUMERATOR*, error> createdeviceenumerator(void);
 
     FN_NOTIMPLEMENTED_PRIORITYMAX
-    Expected<audio_drivermeta*, error> enumerateendpoints(
+    Expected<ENDPOINTS_METADATA, error> enumerateendpoints(
         MM_DEVICE_ENUMERATOR*
     );
 
@@ -66,50 +72,42 @@ namespace wasapi {
         return o;
     }
 
-    Expected<audio_drivermeta*, error> wasapi::enumerateendpoints(
+    Expected<ENDPOINTS_METADATA, error> wasapi::enumerateendpoints(
         MM_DEVICE_ENUMERATOR* e
     )
     {
         HRESULT hr;
-        audio_drivermeta* o;
+        ENDPOINTS_METADATA o;
 
         IMMDeviceCollection* coll;
-
         hr = e->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &coll);
         if FAILED(hr)
             return ::error_errorfromhr(hr);
 
-        auto seColl = ScopeExit(
-            [&coll](void) -> void
-                { coll->Release(); }
-        );
-
         UINT no;
-        coll->GetCount(&no);
+        (void)coll->GetCount(&no);
 
-        /*
-         * + 1 for the sentinel
-         */
-        o = new audio_drivermeta[no + 1];
-        ::memset(o, 0x00, ((no + 1) * (sizeof * o)));
-
-        auto seDm = ScopeExit(
-            [&o, no](void) -> void
+        auto seColl = ScopeExit(
+            [&coll, no](void) -> void
             {
-                u32_t i = 0;
-                for (;;) {
-                    if (i > no)
-                        break;
+                for (UINT i = 0; i < no; i++) {
+                    MM_DEVICE* device;
+                    (void)coll->Item(i, &device);
 
-                    if (o[i].driver == nullptr)
-                        break;
-
-                    static_cast<MM_DEVICE*>(o[i].driver)->Release();
-                    i++;
+                    if (auto* p = device)
+                        p->Release();
                 }
 
-                delete[] o;
+                coll->Release();
             }
+        );
+
+        audio_drivermeta* metas = new audio_drivermeta[no];
+        ::memset(metas, 0x00, (no * (sizeof * metas)));
+
+        auto seDm = ScopeExit(
+            [&metas](void) -> void
+                { delete[] metas; }
         );
 
         for (UINT i = 0; i < no; i++) {
@@ -121,8 +119,11 @@ namespace wasapi {
             auto dm = ::dmfromdevice(device);
             if (!dm)
                 return dm.Error();
-            o[i] = *dm;
+            metas[i] = *dm;
         }
+
+        o.metas = metas;
+        o.noMetas = no;
 
         seDm.Cancel();
         return o;
