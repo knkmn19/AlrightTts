@@ -37,7 +37,18 @@ static int startkernel(void);
 static void uninit(void);
 
 static int init(void)
-    { return 0; }
+{
+    error e;
+    if (e = ::audio_init())
+        goto ret;
+
+    if (e = ::tts_init())
+        goto ret;
+
+ret:
+    std::cerr << "init : " << ::error_what(e) << std::endl;
+    return e;
+}
 
 static int setupaudio(void)
     { return 0; }
@@ -54,7 +65,6 @@ int main(int, char** vector)
 
     (void)vector;
 
-    o = ::init();
     if (o = ::init())
         return o;
 
