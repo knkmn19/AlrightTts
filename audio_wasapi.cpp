@@ -64,7 +64,7 @@ namespace wasapi {
 
     Expected<MM_DEVICE*, error> createdevice(LPCWSTR guid);
 
-    Expected<WAS_AUDIO_CLIENT*, error> createclient(MM_DEVICE*);
+    Expected<WAS_AUDIO_CLIENT*, error> createclient(MM_DEVICE*, HANDLE event);
 
     WAVEFORMATEXTENSIBLE preferredmixformatof(WAS_AUDIO_CLIENT*);
 
@@ -254,7 +254,9 @@ namespace wasapi {
         return o;
     }
 
-    Expected<WAS_AUDIO_CLIENT*, error> wasapi::createclient(MM_DEVICE* device)
+    Expected<WAS_AUDIO_CLIENT*, error> wasapi::createclient(
+        MM_DEVICE* device, HANDLE event
+    )
     {
         HRESULT hr;
         WAS_AUDIO_CLIENT* o;
@@ -271,6 +273,14 @@ namespace wasapi {
             AUDCLNT_STREAMFLAGS_EVENTCALLBACK, 0, 0, &wfe.Format,
             NULL
         );
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+
+        hr = o->SetEventHandle(event);
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+
+        hr = o->Start();
         if FAILED(hr)
             return ::error_errorfromhr(hr);
 
