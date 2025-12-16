@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="annotations.h" />
     <ClInclude Include="audio.h" />
+    <ClInclude Include="debug.h" />
     <ClInclude Include="error.h" />
     <ClInclude Include="expected.hpp" />
     <ClInclude Include="external\voicevox\voicevox_core.h" />
