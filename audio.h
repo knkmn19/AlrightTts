@@ -18,8 +18,17 @@ struct audio_drivermeta {
 };
 
 struct audio_engine {
+    /*
+     * set this to true when its false and you want a new track to play
+     */
+    bool_t bplaying;
+
+    /*
+     * dat of track you wanna play
+     */
     byte_t* bufread;
     size_t szbufread;
+
     /*
      * rest is variable length
      */
