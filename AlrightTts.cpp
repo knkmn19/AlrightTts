@@ -9,31 +9,65 @@ extern "C" {
 #include <iostream>
 #include "scopeexit.hpp"
 
+/*
+ * init audio and tts subsystems
+ */
+static int init(void);
+
+/*
+ * enumerate drivers
+ * ask for which one(s
+ * create audio engine
+ */
+static int setupaudio(void);
+
+/*
+ * wait for input ending with \n
+ * write each character from stdin into variable length string
+ * convert string to wav
+ * if pcm already inflight in audio wait
+ * set pcm in audio
+ * continue
+ */
+static int startkernel(void);
+
+/*
+ * clean up
+ */
+static void uninit(void);
+
+static int init(void)
+    { return 0; }
+
+static int setupaudio(void)
+    { return 0; }
+
+static int startkernel(void)
+    { return 0; }
+
+static void uninit(void)
+    { ; }
+
 int main(int, char** vector)
 {
+    int o;
+
     (void)vector;
 
-    if (auto e = ::tts_init())
-        return (std::cout << ::error_what(e) << std::endl, e);
+    o = ::init();
+    if (o = ::init())
+        return o;
 
-    auto seTts = ScopeExit(
+    auto se = ScopeExit(
         [](void) -> void
-            { ::tts_destroy(); }
+            { ::uninit(); }
     );
 
-    audio_drivermeta const* metas;
-    if (auto e = ::audio_putdrivermeta(&metas))
-        return (std::cout << ::error_what(e) << std::endl, e);
+    if (o = ::setupaudio())
+        return o;
 
-    auto seDm = ScopeExit(
-        [&metas](void) -> void
-            { ::audio_freedrivermeta(&metas); }
-    );
-
-    for (size_t i = 0; (metas + i)->driver != nullptr; i++) {
-        auto const* dm = (metas + i);
-        std::cout << dm->name << std::endl;
-    }
+    if (o = ::startkernel())
+        return o;
 
     std::cout << "Hello World!\n";
 
