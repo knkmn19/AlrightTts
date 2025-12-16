@@ -133,6 +133,14 @@ namespace wasapi {
         HRESULT hr;
         audio_drivermeta o = { };
 
+        /*
+         * https://learn.microsoft.com/en-us/windows/win32/api/mmdeviceapi/nf-mmdeviceapi-immdeviceenumerator-getdevice
+         * so individual enum|device refs can be released For Free
+         */
+        hr = device->GetId(reinterpret_cast<LPWSTR*>(&o.driver));
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+
         IPropertyStore* props;
         hr = device->OpenPropertyStore(STGM_READ, &props);
         if FAILED(hr)
@@ -149,7 +157,6 @@ namespace wasapi {
             o.name, sizeof o.name,
             nullptr, nullptr
         );
-        o.driver = device;
 
         hr = ::PropVariantClear(&name);
         if FAILED(hr)
