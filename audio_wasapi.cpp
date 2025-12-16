@@ -171,7 +171,7 @@ namespace wasapi {
                 break;
 
             ::WaitForSingleObject(this->eventCallback, INFINITE);
-            bool const bSilence = !::InterlockedCompareExchange(
+            bool const bPlaying = ::InterlockedCompareExchange(
                 reinterpret_cast<dword_t*>(&this->engine.bplaying), 0u, 0u
             );
 
@@ -184,18 +184,18 @@ namespace wasapi {
             if CMP_UNLIKELY (szPacket == 0)
                 continue;
 
-            DWORD silent = ((bSilence) ? (AUDCLNT_BUFFERFLAGS_SILENT) : (0));
             byte_t* packet;
             hr = this->renderclient->GetBuffer(szPacket, &packet);
             if CMP_UNLIKELY (FAILED(hr))
                 return ::error_errorfromhr(hr);
             {
-                if (!silent) {
+                ::memset(packet, 0x00, szPacket);
+                if (bPlaying) {
                     ;
                     ;
                 }
             }
-            hr = this->renderclient->ReleaseBuffer(szPacket, silent);
+            hr = this->renderclient->ReleaseBuffer(szPacket, 0);
             if CMP_UNLIKELY (FAILED(hr))
                 return ::error_errorfromhr(hr);
         }
