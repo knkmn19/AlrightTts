@@ -6,6 +6,7 @@ extern "C" {
     #include "audio.h"
 
     #include "annotations.h"
+    #include "debug.h"
 
 extern "C++" {
 
@@ -20,7 +21,6 @@ extern "C++" {
     #include <Functiondiscoverykeys_devpkey.h>
 
     #include <new>
-    #include <cassert>
     #include "expected.hpp"
     #include "scopeexit.hpp"
 
@@ -201,6 +201,7 @@ namespace wasapi {
                     ::memcpy(packet, engine.bufread, szWrite);
                     engine.bufread += szWrite;
                     engine.szbufread -= szWrite;
+                    ::printf("just wrote [%zu]\n", szWrite);
 
                     if (engine.szbufread == 0)
                         engine.bplaying = false;
