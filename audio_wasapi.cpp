@@ -114,6 +114,7 @@ namespace wasapi {
                 { (void)engine.client->Stop(); }
         );
 
+        seWriteE.Run();
         if (e = engine.Mix())
             return;
     }
