@@ -127,18 +127,17 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)voicevox_core.lib;$(ProjectDir)voicevox_onnxruntime.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>voicevox_onnxruntime.lib;voicevox_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AlrightTts.cpp" />
-    <ClCompile Include="audio_stub.c" />
-    <ClCompile Include="system_windows.c" />
-    <ClCompile Include="tts_stub.c" />
+    <ClCompile Include="audio_wasapi.cpp" />
+    <ClCompile Include="tts_voicevox.c" />
   </ItemGroup>
   <ItemGroup>
     <Text Include=".editorconfig" />
+    <Text Include="thankyou.TXT" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
