@@ -39,15 +39,12 @@ namespace wasapi {
         size_t noMetas;
     };
 
-    FN_NOTIMPLEMENTED_PRIORITYMAX
     Expected<MM_DEVICE_ENUMERATOR*, error> createdeviceenumerator(void);
 
-    FN_NOTIMPLEMENTED_PRIORITYMAX
     Expected<ENDPOINTS_METADATA, error> enumerateendpoints(
         MM_DEVICE_ENUMERATOR*
     );
 
-    FN_NOTIMPLEMENTED_PRIORITYMAX
     Expected<audio_drivermeta, error> dmfromdevice(MM_DEVICE*);
 
 } // wasapi
@@ -184,7 +181,7 @@ namespace wasapi {
     void audio_uninit(void)
         { ::CoUninitialize(); }
 
-    error audio_putdrivermeta(audio_drivermeta const** ptrdms, size_t* no)
+    error audio_putdrivermeta(audio_drivermeta const** ptrdms, size_t* ptrno)
     {
         auto enumerator = wasapi::createdeviceenumerator();
         if (!enumerator)
@@ -199,7 +196,8 @@ namespace wasapi {
         if (!metas)
             return metas.Error();
 
-        *ptrdms = *metas;
+        *ptrdms = (*metas).metas;
+        *ptrno = (*metas).noMetas;
         return error_ok;
     }
 
