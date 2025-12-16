@@ -65,6 +65,43 @@ namespace wasapi {
      */
     using namespace wasapi;
 
+    void wasapi::ENGINE::main(void* p)
+    {
+        auto& engine = **static_cast<wasapi::ENGINE**>(p);
+        engine.errorThrd = error_fail;
+        ::WakeByAddressSingle(&engine.errorThrd);
+    }
+
+    error wasapi::ENGINE::Initialize(audio_drivermeta const& dm)
+    {
+        this->errorThrd = error_unset;
+
+        ENGINE* me = this;
+        if (::_beginthread(ENGINE::main, 0, &me) == -1L)
+            return error_badalloc;
+
+        error errorStale = error_unset;
+        error errorReal;
+        for (;;) {
+            BOOL b = ::WaitOnAddress(
+                &this->errorThrd, &errorStale, sizeof errorStale, INFINITE
+            );
+
+            errorReal = static_cast<error>(
+                ::InterlockedCompareExchange(
+                    reinterpret_cast<LONG*>(&this->errorThrd), 0u, 0u
+                )
+            );
+            if (errorReal != errorStale)
+                /*
+                 * safe to clean up stack and leave
+                 */
+                break;
+        }
+
+        return errorReal;
+    }
+
     Expected<MM_DEVICE_ENUMERATOR*, error> wasapi::createdeviceenumerator(void)
     {
         HRESULT hr;
@@ -224,11 +261,20 @@ namespace wasapi {
         audio_drivermeta const dm, audio_engine** ptra
     )
     {
+        error e;
         (void)dm;
 
         auto* o = new (std::nothrow) wasapi::ENGINE;
         if (o == nullptr)
             return error_badalloc;
+
+        auto seDestroy = ScopeExit(
+            [&o](void) -> void
+                { delete o; }
+        );
+
+        if (e = o->Initialize(dm))
+            return e;
 
         *ptra = reinterpret_cast<audio_engine*>(o);
         return error_ok;
