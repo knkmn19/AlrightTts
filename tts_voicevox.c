@@ -6,6 +6,23 @@
 #pragma comment(lib, "voicevox_core.lib")
 #pragma comment(lib, "voicevox_onnxruntime.lib")
 
+#include "voicevox/voicevox_core.h"
+
+static error error_errorfromvoicevox(VoicevoxResultCode);
+
+static error error_errorfromvoicevox(VoicevoxResultCode r)
+{
+    switch (r) {
+    default:
+        break;
+
+    case VOICEVOX_RESULT_OK:
+        return error_ok;
+    }
+
+    return error_fail;
+}
+
 error tts_init(void)
     { return error_ok; }
 
