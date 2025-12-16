@@ -448,6 +448,7 @@ namespace wasapi {
         auto* o = new (std::nothrow) wasapi::ENGINE;
         if (o == nullptr)
             return error_badalloc;
+        ::memset(o, 0x00, sizeof *o);
 
         auto seDestroy = ScopeExit(
             [&o](void) -> void
