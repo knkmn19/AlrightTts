@@ -104,6 +104,9 @@ static int startkernel(audio_engine* a)
         while ((c = std::getchar()) != '\n')
             in += c;
 
+        if (in.length() == 0u)
+            continue;
+
         tts_pcmdesc d = { };
         if (e = ::tts_pcmfromutf8(in.c_str(), &d))
             return ::printerror("kernel", e);
