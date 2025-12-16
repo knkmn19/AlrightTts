@@ -84,6 +84,7 @@ static int setupaudio(audio_engine*& ptra)
     if (e = ::audio_createenginewith(metas[iSelected], &o))
         return ::printerror("setup", e);
 
+    ptra = o;
     return 0;
 }
 
