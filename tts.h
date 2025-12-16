@@ -12,10 +12,20 @@
 #include "error.h"
 #include "types.h"
 
+typedef enum {
+    tts_pcmformat_int16,
+} tts_pcmformat;
+
+struct tts_pcmdesc {
+    byte_t* buf;
+    size_t sz;
+    tts_pcmformat format;
+};
+
 error tts_init(void);
 void tts_destroy(void);
 
-error tts_pcmfromutf8(char const*, byte_t**, size_t);
-void tts_freepcm(byte_t*);
+error tts_pcmfromutf8(char const*, struct tts_pcmdesc*);
+void tts_freepcm(struct tts_pcmdesc const);
 
 #endif /* !ALRTTS_TTS */
