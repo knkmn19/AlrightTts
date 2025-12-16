@@ -68,6 +68,10 @@ namespace wasapi {
 
     WAVEFORMATEXTENSIBLE preferredmixformatof(WAS_AUDIO_CLIENT*);
 
+    Expected<WAS_AUDIO_RENDER_CLIENT*, error> queryrenderclientfrom(
+        WAS_AUDIO_CLIENT*
+    );
+
 } // wasapi
 
     /*
@@ -292,6 +296,36 @@ namespace wasapi {
             o.Format = *wf;
 
         ::CoTaskMemFree(wf);
+
+        return o;
+    }
+
+    Expected<WAS_AUDIO_RENDER_CLIENT*, error> wasapi::queryrenderclientfrom(
+        WAS_AUDIO_CLIENT* client
+    )
+    {
+        HRESULT hr;
+        WAS_AUDIO_RENDER_CLIENT* o;
+
+        hr = client->GetService(IID_PPV_ARGS(&o));
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+
+        /*
+         * make the beginning silent just for safety
+         */
+        UINT32 szBuffer;
+        hr = client->GetBufferSize(&szBuffer);
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+
+        byte_t* _;
+        hr = o->GetBuffer(szBuffer, &_);
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
+        hr = o->ReleaseBuffer(szBuffer, AUDCLNT_BUFFERFLAGS_SILENT);
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
 
         return o;
     }
