@@ -162,16 +162,22 @@ namespace wasapi {
 
 } // extern "C++"
 
-    error audio_putdrivermeta(audio_drivermeta const** ptrdms)
+    error audio_init(void)
     {
-        /* set up com */ {
-            HRESULT hr;
+        HRESULT hr;
 
-            hr = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
-            if FAILED(hr)
-                return ::error_errorfromhr(hr);
-        }
+        hr = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if FAILED(hr)
+            return ::error_errorfromhr(hr);
 
+        return error_ok;
+    }
+
+    void audio_uninit(void)
+        { ::CoUninitialize(); }
+
+    error audio_putdrivermeta(audio_drivermeta const** ptrdms, size_t* no)
+    {
         auto enumerator = wasapi::createdeviceenumerator();
         if (!enumerator)
             return enumerator.Error();
@@ -189,15 +195,10 @@ namespace wasapi {
         return error_ok;
     }
 
-    void audio_freedrivermeta(audio_drivermeta const** ptrdms)
+    void audio_freedrivermeta(struct audio_drivermeta const* dms)
     {
-        audio_drivermeta const* dm = *ptrdms;
-        for (;;) {
-            if (dm == NULL)
-                break;
-            (void)dm;
-            dm += 1;
-        }
+        (void)dms;
+        ;
     }
 
     error audio_createenginewith(
@@ -211,10 +212,7 @@ namespace wasapi {
     void audio_destroyengine(audio_engine* a)
     {
         (void)a;
-        /*
-         * and uninit com here
-         */
-        ::CoUninitialize();
+        ;
     }
 
 } // extern "C"
