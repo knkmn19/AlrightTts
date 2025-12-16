@@ -18,6 +18,8 @@ struct audio_drivermeta {
 };
 
 struct audio_engine {
+    struct audio_drivermeta drivermeta;
+
     /*
      * set this to true when its false and you want a new track to play
      */
