@@ -29,6 +29,11 @@ static int init(void);
 static int setupaudio(audio_engine*&);
 
 /*
+ * not much customisation here but
+ */
+static int setuptts(tts_engine*&);
+
+/*
  * wait for input ending with \n
  * write each character from stdin into variable length string
  * convert string to wav
@@ -65,7 +70,7 @@ static int setupaudio(audio_engine*& ptra)
     audio_drivermeta const* metas;
     size_t noMeta;
     if (e = ::audio_putdrivermeta(&metas, &noMeta))
-        return ::printerror("setup", e);
+        return ::printerror("audio", e);
 
     auto seDm = ScopeExit(
         [&metas](void) -> void
@@ -83,9 +88,18 @@ static int setupaudio(audio_engine*& ptra)
         iSelected = (std::getchar() - '0');
 
     if (e = ::audio_createenginewith(metas[iSelected], &o))
-        return ::printerror("setup", e);
+        return ::printerror("audio", e);
 
     ptra = o;
+    return 0;
+}
+
+static int setuptts(tts_engine*& ptre)
+{
+    error e;
+    if (e = ::tts_createengine(&ptre))
+        return ::printerror("tts", e);
+
     return 0;
 }
 
@@ -163,12 +177,21 @@ int main(int, char** vector)
     );
 
     audio_engine* a;
+    tts_engine* tts;
     if (o = ::setupaudio(a))
         return o;
 
     auto seAudio = ScopeExit(
         [&a](void) -> void
             { ::audio_destroyengine(a); }
+    );
+
+    if (o = ::setuptts(tts))
+        return o;
+
+    auto seTts = ScopeExit(
+        [&tts](void) -> void
+            { ::tts_destroyengine(tts); }
     );
 
     if (o = ::startkernel(a))
