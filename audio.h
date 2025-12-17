@@ -13,13 +13,22 @@
 #include "error.h"
 #include "tts.h"
 
+typedef enum {
+    audio_format_u8,
+    audio_format_i16,
+    audio_format_f32,
+} audio_format;
+
 struct audio_drivermeta {
     void* driver;
     char name[256];
 };
 
 struct audio_meta {
-    unsigned : 0;
+    u8_t nochannels;
+    u32_t hzfreq;
+    u32_t bitssample;
+    audio_format format;
 };
 
 struct audio_engine {
