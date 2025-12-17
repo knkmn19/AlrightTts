@@ -163,7 +163,44 @@ static error tts_pcmfromvvwav(
     assert(chunkfmt->bits == 16);
     assert(chunkfmt->nochannels == 1);
 
-    return error_fail;
+    while (*(dword_t*)datwav != *(dword_t*)"data")
+        datwav += 1;
+    datwav += 4;
+
+    /*
+     * *(dword_t*)datwav
+     * this is equivalent to using the ptr difference but reading this is
+     * probably safer (somehow
+     * 
+     * the other * 2s are from 24khz => 48khz, int16 => float32 and
+     * mono => stereo
+     */
+    size_t const szwav = *(dword_t*)datwav;
+    datwav += 4;
+
+    o.sz = (
+        szwav *
+        (48000 / 24000) *
+        (sizeof (f32_t) / sizeof (i16_t)) *
+        (2 / 1)
+    );
+
+    o.buf = malloc(o.sz);
+    if (o.buf == NULL)
+        return error_badalloc;
+
+    for (size_t i = 0; i < (szwav / sizeof(i16_t)); i++) {
+        i16_t const src = wav.buf[i];
+        f32_t* dst = ((f32_t*)o.buf + (4 * i));
+
+        f32_t register const f = ((1.0f * src) / (1ul << 15));
+        *(dst + 0) = f;
+        *(dst + 1) = f;
+        *(dst + 2) = f;
+        *(dst + 3) = f;
+    }
+
+    return error_ok;
 }
 
 error tts_init(void)
