@@ -549,7 +549,7 @@ namespace wasapi {
     void audio_destroyengine(audio_engine* a)
     {
         if (auto* p = reinterpret_cast<wasapi::ENGINE*>(a))
-            delete a;
+            delete p;
     }
 
 } // extern "C"
