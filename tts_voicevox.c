@@ -6,6 +6,8 @@
 #pragma comment(lib, "voicevox_core.lib")
 #pragma comment(lib, "voicevox_onnxruntime.lib")
 
+#include <stdlib.h>
+#include <string.h>
 #include "voicevox/voicevox_core.h"
 
 struct tts_voicevox_engine {
@@ -97,8 +99,25 @@ void tts_uninit(void)
 
 error tts_createengine(struct tts_engine** ptre)
 {
-    (void)ptre;
+    error e;
+    struct tts_voicevox_engine* o;
+
+    o = malloc(sizeof *o);
+    if (o == NULL)
+        return error_badalloc;
+    memset(o, 0x00, sizeof *o);
+
+    e = tts_voicevox_engine_setupsynthesizer(o);
+    if (e != error_ok)
+        goto freeengine;
+
+    *ptre = o;
     return error_ok;
+
+freeengine:
+    free(o);
+
+    return e;
 }
 
 error tts_pcmfromutf8(
