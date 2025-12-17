@@ -197,6 +197,9 @@ namespace wasapi {
         if (FAILED(hr))
             return ::error_errorfromhr(hr);
 
+        audio_meta const& meta = this->engine.meta;
+        size_t const szFrame = (meta.nochannels * (meta.bitssample / 8u));
+
         for (;;) {
             bool const bExit = ::InterlockedCompareExchange(
                 reinterpret_cast<dword_t*>(&this->bShouldExit), 0u, 0u
@@ -218,13 +221,12 @@ namespace wasapi {
             if CMP_UNLIKELY (noFrames == 0)
                 continue;
 
-            size_t const szPacket = (noFrames * 8);
-
             byte_t* packet;
             hr = this->renderclient->GetBuffer(noFrames, &packet);
             if CMP_UNLIKELY (FAILED(hr))
                 return ::error_errorfromhr(hr);
             {
+                size_t const szPacket = (noFrames * szFrame);
                 ::memset(packet, 0x00, szPacket);
 
                 if (bPlaying) {
