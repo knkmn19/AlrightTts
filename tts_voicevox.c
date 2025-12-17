@@ -24,7 +24,18 @@ static error error_errorfromvoicevox(VoicevoxResultCode r)
 }
 
 error tts_init(void)
-    { return error_ok; }
+{
+    VoicevoxResultCode r;
+
+    struct VoicevoxOnnxruntime const* onnxrt;
+    r = voicevox_onnxruntime_load_once(
+        voicevox_make_default_load_onnxruntime_options(), &onnxrt
+    );
+    if (r != VOICEVOX_RESULT_OK)
+        return error_errorfromvoicevox(r);
+
+    return error_ok;
+}
 
 void tts_uninit(void)
     { ; }
