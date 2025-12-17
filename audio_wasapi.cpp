@@ -190,12 +190,14 @@ namespace wasapi {
             if CMP_UNLIKELY (FAILED(hr))
                 return ::error_errorfromhr(hr);
 
-            size_t const szPacket = (szBuf - pad);
-            if CMP_UNLIKELY (szPacket == 0)
+            size_t const noFrames = (szBuf - pad);
+            if CMP_UNLIKELY (noFrames == 0)
                 continue;
 
+            size_t const szPacket = (noFrames * 8);
+
             byte_t* packet;
-            hr = this->renderclient->GetBuffer(szPacket, &packet);
+            hr = this->renderclient->GetBuffer(noFrames, &packet);
             if CMP_UNLIKELY (FAILED(hr))
                 return ::error_errorfromhr(hr);
             {
@@ -208,15 +210,17 @@ namespace wasapi {
                     );
 
                     ::memcpy(packet, engine.bufread, szWrite);
+
                     engine.bufread += szWrite;
                     engine.szbufread -= szWrite;
-                    ::printf("just wrote [%zu]\n", szWrite);
+
+                    ::printf("wrote %zu, %zu left\n", szWrite, engine.szbufread);
 
                     if (engine.szbufread == 0)
                         engine.bplaying = false;
                 }
             }
-            hr = this->renderclient->ReleaseBuffer(szPacket, 0);
+            hr = this->renderclient->ReleaseBuffer(noFrames, 0);
             if CMP_UNLIKELY (FAILED(hr))
                 return ::error_errorfromhr(hr);
         }
@@ -404,6 +408,7 @@ namespace wasapi {
         assert(wfe.Format.nSamplesPerSec == 48000u);
         assert(wfe.Samples.wSamplesPerBlock == 32u);
         assert(wfe.SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
+        assert((wfe.Format.wBitsPerSample / 8u) * wfe.Format.nChannels == 8);
 
         hr = o->Initialize(
             AUDCLNT_SHAREMODE_SHARED,
