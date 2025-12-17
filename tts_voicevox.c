@@ -6,15 +6,30 @@
 #pragma comment(lib, "voicevox_core.lib")
 #pragma comment(lib, "voicevox_onnxruntime.lib")
 
+#include "voicevox/voicevox_core.h"
+
 #include <stdlib.h>
 #include <string.h>
-#include "voicevox/voicevox_core.h"
+#include "debug.h"
 
 struct tts_voicevox_engine {
     struct tts_engine engine;
 
     struct VoicevoxSynthesizer* synthesizer;
 };
+
+#pragma pack(1)
+struct wav_chunk_fmt {
+    byte_t      magicfmt[4];
+    dword_t     szchunk;
+    word_t      format;
+    word_t      nochannels;
+    dword_t     freq;
+    dword_t     : 32;
+    word_t      : 16;
+    word_t      bits;
+};
+#pragma pack(pop)
 
 static error error_errorfromvoicevox(VoicevoxResultCode);
 
@@ -132,6 +147,24 @@ static error tts_pcmfromquery(
     return error_fail;
 }
 
+static error tts_pcmfromvvwav(
+    struct tts_pcmdesc const wav, struct tts_pcmdesc* ptrd
+)
+{
+    struct tts_pcmdesc o;
+
+    byte_t* datwav = wav.buf;
+    while (*(dword_t*)datwav != *(dword_t*)"fmt ")
+        datwav += 1;
+
+    struct wav_chunk_fmt* chunkfmt = datwav;
+    assert(chunkfmt->freq == 24000);
+    assert(chunkfmt->format == 1);
+    assert(chunkfmt->bits == 16);
+    assert(chunkfmt->nochannels == 1);
+
+    return error_fail;
+}
 
 error tts_init(void)
 {
