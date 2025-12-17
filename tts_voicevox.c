@@ -142,9 +142,13 @@ static error tts_pcmfromquery(
 
     e = tts_pcmfromvvwav(wav, ptrd);
     if (e != error_ok)
-        return e;
+        goto freewav;
 
-    return error_fail;
+freewav:
+    voicevox_wav_free(wav.buf);
+
+ret:
+    return e;
 }
 
 static error tts_pcmfromvvwav(
