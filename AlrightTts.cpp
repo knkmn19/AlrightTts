@@ -13,7 +13,7 @@ extern "C" {
 
 inline static error printerror(char const* where, error e)
 {
-    std::cerr << where << " : " << ::error_what(e) << std::endl;
+    std::fprintf(stderr, "%s : %s\n", where, ::error_what(e));
     return e;
 }
 
@@ -81,10 +81,10 @@ static int setupaudio(audio_engine*& ptra)
             { ::audio_freedrivermeta(metas); }
     );
 
-    std::cout << "pick one from" << std::endl;
+    std::puts(":pick one fromm");
     for (size_t i = 0; i < noMeta; i++) {
         audio_drivermeta const& dm = metas[i];
-        std::cout << "[" << i << "] - " << dm.name << std::endl;
+        std::printf(":[%d] %s\n", i, dm.name);
     }
 
     size_t iSelected = noMeta;
@@ -197,7 +197,7 @@ int main(int, char** vector)
             { ::tts_destroyengine(tts); }
     );
 
-    std::cout << "ready!!!!!!" << std::endl;
+    std::puts(":ready!!!!!!!!!");
     if (o = ::startkernel(a, tts))
         return o;
 
