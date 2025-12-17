@@ -194,6 +194,7 @@ int main(int, char** vector)
             { ::tts_destroyengine(tts); }
     );
 
+    std::cout << "ready!!!!!!" << std::endl;
     if (o = ::startkernel(a, tts))
         return o;
 
