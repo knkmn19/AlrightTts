@@ -145,7 +145,7 @@ static int startkernel(audio_engine* a, tts_engine* tts)
          * its aligned but should still mmake it clear this is an atomic loadd
          */
         while (a->bplaying)
-            ;
+            std::printf(":waiting on audio still in flight.......\r");
 
         if (dPrev.buf != nullptr)
             ::tts_freepcm(dPrev);
@@ -154,6 +154,7 @@ static int startkernel(audio_engine* a, tts_engine* tts)
         a->bplaying = true;
 
         dPrev = d;
+        std::puts(":go next                                        ");
     }
 
     return 0;
