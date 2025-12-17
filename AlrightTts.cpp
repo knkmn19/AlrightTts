@@ -150,8 +150,7 @@ static int startkernel(audio_engine* a, tts_engine* tts)
         if (dPrev.buf != nullptr)
             ::tts_freepcm(dPrev);
 
-        a->szbufread = d.sz;
-        a->bufread = d.buf;
+        a->pcmdesc = d;
         a->bplaying = true;
 
         dPrev = d;

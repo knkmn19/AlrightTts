@@ -203,21 +203,19 @@ namespace wasapi {
             {
                 ::memset(packet, 0x00, szPacket);
                 if (bPlaying) {
-                    audio_engine& engine = this->engine;
+                    tts_pcmdesc& pcm = this->engine.pcmdesc;
                     size_t const szWrite = (
-                        (szPacket < engine.szbufread) ?
-                        (szPacket) : (engine.szbufread)
+                        (szPacket < pcm.sz) ?
+                        (szPacket) : (pcm.sz)
                     );
 
-                    ::memcpy(packet, engine.bufread, szWrite);
+                    ::memcpy(packet, pcm.buf, szWrite);
 
-                    engine.bufread += szWrite;
-                    engine.szbufread -= szWrite;
+                    pcm.buf += szWrite;
+                    pcm.sz -= szWrite;
 
-                    ::printf("wrote %zu, %zu left\n", szWrite, engine.szbufread);
-
-                    if (engine.szbufread == 0)
-                        engine.bplaying = false;
+                    if (pcm.sz == 0)
+                        this->engine.bplaying = false;
                 }
             }
             hr = this->renderclient->ReleaseBuffer(noFrames, 0);
