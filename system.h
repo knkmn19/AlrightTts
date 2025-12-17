@@ -10,6 +10,9 @@
 #endif /* (_MSC_VER > 1000) */
 
 #include "error.h"
+#include "types.h"
+
+bool_t g_bexit;
 
 error console_init(void);
 
