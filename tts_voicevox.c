@@ -179,25 +179,19 @@ static error tts_pcmfromvvwav(
      * the other * 2s are from 24khz => 48khz, int16 => float32 and
      * mono => stereo
      */
-    size_t const szwav = *(dword_t*)datwav;
+    size_t const nosamples = (*(dword_t*)datwav / sizeof(i16_t));
     datwav += 4;
 
-    o.sz = (
-        szwav *
-        (48000 / 24000) *
-        (sizeof (f32_t) / sizeof (i16_t)) *
-        (2 / 1)
-    );
-
+    o.sz = (nosamples * (48000 / 24000) * (sizeof (f32_t)) * (2 / 1));
     o.buf = malloc(o.sz);
     if (o.buf == NULL)
         return error_badalloc;
 
-    for (size_t i = 0; i < (szwav / sizeof(i16_t)); i++) {
+    for (size_t i = 0; i < nosamples; i++) {
         i16_t const src = ((i16_t*)wav.buf)[i];
         f32_t* dst = ((f32_t*)o.buf + (4 * i));
 
-        f32_t register const f = ((1.0f * src) / (1ul << 15));
+        f32_t register const f = (src * (1.0f / (1ul << 15)));
         *(dst + 0) = f;
         *(dst + 1) = f;
         *(dst + 2) = f;
