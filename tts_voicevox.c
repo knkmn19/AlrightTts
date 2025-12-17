@@ -8,6 +8,12 @@
 
 #include "voicevox/voicevox_core.h"
 
+struct tts_voicevox_engine {
+    struct tts_engine engine;
+
+    struct VoicevoxSynthesizer* synthesizer;
+};
+
 static error error_errorfromvoicevox(VoicevoxResultCode);
 
 static error error_errorfromvoicevox(VoicevoxResultCode r)
