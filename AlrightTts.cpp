@@ -120,7 +120,7 @@ static int startkernel(audio_engine* a)
         std::string in = ::strfrominbuf();
 
         tts_pcmdesc d = { };
-        if (e = ::tts_pcmfromutf8(in.c_str(), &d))
+        if (e = ::tts_pcmfromutf8(nullptr, in.c_str(), &d))
             return ::printerror("kernel", e);
 
         /*

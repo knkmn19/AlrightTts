@@ -27,12 +27,17 @@ struct tts_pcmdesc {
 error tts_init(void);
 void tts_uninit(void);
 
+error tts_createengine(struct tts_engine**);
 /*
  * freq     : 48000 hz
  * bitdepth : float32
  * channels : 2
  */
-error tts_pcmfromutf8(char const*, struct tts_pcmdesc*);
+error tts_pcmfromutf8(
+    struct tts_engine const*, char const*, struct tts_pcmdesc*
+);
+void tts_destroyengine(struct tts_engine*);
+
 void tts_freepcm(struct tts_pcmdesc const);
 
 #endif /* !ALRTTS_TTS */
