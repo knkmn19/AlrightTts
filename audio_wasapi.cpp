@@ -89,6 +89,8 @@ namespace wasapi {
         WAS_AUDIO_CLIENT*
     );
 
+    audio_format audioformatof(WAVEFORMATEXTENSIBLE const&);
+
 } // wasapi
 
     /*
@@ -475,6 +477,48 @@ namespace wasapi {
         hr = o->ReleaseBuffer(szBuffer, AUDCLNT_BUFFERFLAGS_SILENT);
         if FAILED(hr)
             return ::error_errorfromhr(hr);
+
+        return o;
+    }
+
+    audio_format wasapi::audioformatof(WAVEFORMATEXTENSIBLE const& wfe)
+    {
+        audio_format o;
+
+        u32_t const bitssample = wfe.Format.wBitsPerSample;
+        switch (wfe.Format.wFormatTag) {
+        default:
+            assert(false);
+            break;
+
+        fmtfloat:
+            /* fallthrough */
+        case WAVE_FORMAT_IEEE_FLOAT:
+            if (bitssample == 32u)
+                o = audio_format_f32;
+            else
+                assert(false);
+            break;
+
+        fmtint:
+            /* fallthrough */
+        case WAVE_FORMAT_PCM:
+            if (bitssample == 16u)
+                o = audio_format_i16;
+            else if (bitssample == 8u)
+                o = audio_format_u8;
+            else
+                assert(false);
+            break;
+
+        case WAVE_FORMAT_EXTENSIBLE:
+            if (wfe.SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
+                goto fmtfloat;
+            else if (wfe.SubFormat == KSDATAFORMAT_SUBTYPE_PCM)
+                goto fmtint;
+            assert(false);
+            break;
+        }
 
         return o;
     }
