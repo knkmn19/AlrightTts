@@ -53,6 +53,9 @@ static error error_errorfromvoicevox(VoicevoxResultCode r)
     default:
         break;
 
+    case VOICEVOX_RESULT_ANALYZE_TEXT_ERROR:
+        return error_invalidtextinput;
+
     case VOICEVOX_RESULT_OK:
         return error_ok;
     }
