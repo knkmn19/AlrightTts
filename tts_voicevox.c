@@ -157,7 +157,7 @@ static error tts_pcmfromvvwav(
 {
     struct tts_pcmdesc o;
 
-    byte_t* datwav = wav.buf;
+    byte_t const* datwav = wav.buf;
     while (*(dword_t*)datwav != *(dword_t*)"fmt ")
         datwav += 1;
 
@@ -188,7 +188,7 @@ static error tts_pcmfromvvwav(
         return error_badalloc;
 
     for (size_t i = 0; i < nosamples; i++) {
-        i16_t const src = ((i16_t*)wav.buf)[i];
+        i16_t const src = ((i16_t*)datwav)[i];
         f32_t* dst = ((f32_t*)o.buf + (4 * i));
 
         f32_t register const f = (src * (1.0f / (1ul << 15)));
