@@ -427,11 +427,6 @@ namespace wasapi {
             return ::error_errorfromhr(hr);
 
         WAVEFORMATEXTENSIBLE wfe = wasapi::preferredmixformatof(o);
-        assert(wfe.Format.nChannels == 2u);
-        assert(wfe.Format.nSamplesPerSec == 48000u);
-        assert(wfe.Samples.wSamplesPerBlock == 32u);
-        assert(wfe.SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
-        assert((wfe.Format.wBitsPerSample / 8u) * wfe.Format.nChannels == 8);
 
         hr = o->Initialize(
             AUDCLNT_SHAREMODE_SHARED,
@@ -585,6 +580,7 @@ namespace wasapi {
         return error_ok;
     }
 
+    FN_NOTIMPLEMENTED_PRIORITYLOW
     void audio_freedrivermeta(struct audio_drivermeta const* dms)
     {
         if (auto* p = dms)
@@ -616,6 +612,7 @@ namespace wasapi {
         return error_ok;
     }
 
+    FN_NOTIMPLEMENTED_PRIORITYLOW
     void audio_destroyengine(audio_engine* a)
     {
         if (auto* p = reinterpret_cast<wasapi::ENGINE*>(a))
