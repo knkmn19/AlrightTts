@@ -174,11 +174,26 @@ freeengine:
 }
 
 error tts_pcmfromutf8(
-    struct tts_engine* const e, char const* s, struct tts_pcmdesc* ptrd
+    struct tts_engine* const en, char const* s, struct tts_pcmdesc* ptrd
 )
 {
-    (void)e, (void)s, (void)ptrd;
-    return error_ok;
+    error e = error_ok;
+    struct tts_voicevox_engine* engine = (struct tts_voicevox_engine*)en;
+
+    char* q;
+    e = tts_createquery(engine->synthesizer, s, &q);
+    if (e != error_ok)
+        goto ret;
+
+    e = tts_pcmfromquery(q, engine->synthesizer, ptrd);
+    if (e != error_ok)
+        goto freequery;
+
+freequery:
+    voicevox_json_free(q);
+
+ret:
+    return e;
 }
 
 void tts_destroyengine(struct tts_engine* e)
