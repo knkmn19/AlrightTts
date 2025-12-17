@@ -20,7 +20,7 @@ struct tts_engine {
 };
 
 struct tts_pcmdesc {
-    byte_t* buf;
+    byte_t const* buf;
     size_t sz;
 };
 

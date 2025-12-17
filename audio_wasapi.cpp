@@ -59,10 +59,8 @@ namespace wasapi {
         HANDLE eventCallback;
         WAS_AUDIO_RENDER_CLIENT* renderclient;
 
-        FN_NOTIMPLEMENTED_PRIORITYMAX
         void static main(void* engine);
         error SetupClient(void);
-        FN_NOTIMPLEMENTED_PRIORITYMAX
         error Mix(void) const;
 
         error Initialize(audio_drivermeta const&);
@@ -202,6 +200,7 @@ namespace wasapi {
                 return ::error_errorfromhr(hr);
             {
                 ::memset(packet, 0x00, szPacket);
+
                 if (bPlaying) {
                     tts_pcmdesc& pcm = this->engine.pcmdesc;
                     size_t const szWrite = (
