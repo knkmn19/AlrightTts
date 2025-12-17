@@ -131,8 +131,7 @@ static int startkernel(audio_engine* a, tts_engine* tts)
     tts_pcmdesc dPrev = { };
     dPrev.buf = nullptr;
     for (;;) {
-        bool bSigint = false;
-        if (bSigint)
+        if (g_bexit)
             break;
 
         std::string in = ::strfrominbuf();
