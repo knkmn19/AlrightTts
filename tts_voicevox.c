@@ -266,7 +266,13 @@ ret:
 }
 
 void tts_destroyengine(struct tts_engine* e)
-    { (void)e; }
+{
+    if (e != NULL)
+        free(e);
+}
 
 void tts_freepcm(struct tts_pcmdesc const d)
-    { (void)d; }
+{
+    if (d.buf)
+        free(d.buf);
+}
