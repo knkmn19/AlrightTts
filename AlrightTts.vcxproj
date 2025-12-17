@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClCompile Include="AlrightTts.cpp" />
     <ClCompile Include="audio_wasapi.cpp" />
+    <ClCompile Include="system_windows.c" />
     <ClCompile Include="tts_voicevox.c" />
   </ItemGroup>
   <ItemGroup>
@@ -153,6 +154,7 @@
     <ClInclude Include="expected.hpp" />
     <ClInclude Include="external\voicevox\voicevox_core.h" />
     <ClInclude Include="scopeexit.hpp" />
+    <ClInclude Include="system.h" />
     <ClInclude Include="tts.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>

@@ -4,6 +4,7 @@
 extern "C" {
     #include "audio.h"
     #include "tts.h"
+    #include "system.h"
 } // extern "C"
 
 #include <iostream>
@@ -56,6 +57,9 @@ static int init(void)
         return ::printerror("init", e);
 
     if (e = ::tts_init())
+        return ::printerror("init", e);
+
+    if (e = ::console_init())
         return ::printerror("init", e);
 
     return 0;
