@@ -124,7 +124,14 @@ namespace wasapi {
                 { (void)engine.client->Stop(); }
         );
 
+        if (e = engine.WriteMeta())
+            return;
+
+        /*
+         * allow main thread to continue operation
+         */
         seWriteE.Run();
+
         if (e = engine.Mix())
             return;
     }
