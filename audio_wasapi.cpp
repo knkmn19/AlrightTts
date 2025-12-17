@@ -61,6 +61,7 @@ namespace wasapi {
 
         void static main(void* engine);
         error SetupClient(void);
+        error WriteMeta(void);
         error Mix(void) const;
 
         error Initialize(audio_drivermeta const&);
@@ -161,6 +162,22 @@ namespace wasapi {
         this->renderclient = *renderclient;
 
         seEvent.Cancel();
+        return error_ok;
+    }
+
+    error wasapi::ENGINE::WriteMeta(void)
+    {
+        audio_meta o = { };
+        WAVEFORMATEXTENSIBLE wfe = wasapi::preferredmixformatof(this->client);
+
+        o; {
+            o.nochannels = wfe.Format.nChannels;
+            o.hzfreq = wfe.Format.nSamplesPerSec;
+            o.bitssample = wfe.Format.wBitsPerSample;
+            o.format = wasapi::audioformatof(wfe);
+        }
+
+        this->engine.meta = o;
         return error_ok;
     }
 
