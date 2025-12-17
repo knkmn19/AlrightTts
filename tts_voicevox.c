@@ -194,7 +194,7 @@ static error tts_pcmfromvvwav(
         return error_badalloc;
 
     for (size_t i = 0; i < (szwav / sizeof(i16_t)); i++) {
-        i16_t const src = wav.buf[i];
+        i16_t const src = ((i16_t*)wav.buf)[i];
         f32_t* dst = ((f32_t*)o.buf + (4 * i));
 
         f32_t register const f = ((1.0f * src) / (1ul << 15));
@@ -204,6 +204,7 @@ static error tts_pcmfromvvwav(
         *(dst + 3) = f;
     }
 
+    *ptrd = o;
     return error_ok;
 }
 
