@@ -120,7 +120,7 @@ static std::string strfrominbuf(void)
     return in;
 }
 
-static int startkernel(audio_engine* a)
+static int startkernel(audio_engine* a, tts_engine* tts)
 {
     error e;
 
@@ -134,7 +134,7 @@ static int startkernel(audio_engine* a)
         std::string in = ::strfrominbuf();
 
         tts_pcmdesc d = { };
-        if (e = ::tts_pcmfromutf8(nullptr, in.c_str(), &d))
+        if (e = ::tts_pcmfromutf8(tts, in.c_str(), &d))
             return ::printerror("kernel", e);
 
         /*
@@ -194,7 +194,7 @@ int main(int, char** vector)
             { ::tts_destroyengine(tts); }
     );
 
-    if (o = ::startkernel(a))
+    if (o = ::startkernel(a, tts))
         return o;
 
     std::cout << "Hello World!\n";
