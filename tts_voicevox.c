@@ -16,6 +16,8 @@ struct tts_voicevox_engine {
 
 static error error_errorfromvoicevox(VoicevoxResultCode);
 
+static error tts_voicevox_engine_setupsynthesizer(struct tts_voicevox_engine*);
+
 static error error_errorfromvoicevox(VoicevoxResultCode r)
 {
     switch (r) {
@@ -27,6 +29,53 @@ static error error_errorfromvoicevox(VoicevoxResultCode r)
     }
 
     return error_fail;
+}
+
+static error tts_voicevox_engine_setupsynthesizer(
+    struct tts_voicevox_engine* e
+)
+{
+    VoicevoxResultCode r;
+    struct VoicevoxSynthesizer** ptrsynthesizer = &e->synthesizer;
+
+    /*
+     * gonna hard code all the paths for now cause
+     */
+    struct VoicevoxVoiceModelFile* model;
+    struct OpenJtalkRc* ojt;
+
+    /*
+     * | VVMファイル名 | 話者名 | スタイル名 | スタイルID |
+     * | 1.vvm | 冥鳴ひまり | ノーマル | 14 |
+     */
+    r = voicevox_voice_model_file_open("./models/vvms/1.vvm", &model);
+    if (r != VOICEVOX_RESULT_OK)
+        goto ret;
+
+    r = voicevox_open_jtalk_rc_new("./open_jtalk_dic_utf_8-1.11", &ojt);
+    if (r != VOICEVOX_RESULT_OK)
+        goto deletemodel;
+
+    r = voicevox_synthesizer_new(
+        voicevox_onnxruntime_get(), ojt,
+        voicevox_make_default_initialize_options(),
+        ptrsynthesizer
+    );
+    if (r != VOICEVOX_RESULT_OK)
+        goto deleteojt;
+
+    r = voicevox_synthesizer_load_voice_model(*ptrsynthesizer, model);
+    if (r != VOICEVOX_RESULT_OK)
+        goto deleteojt;
+
+deleteojt:
+    voicevox_open_jtalk_rc_delete(ojt);
+
+deletemodel:
+    voicevox_voice_model_file_delete(model);
+
+ret:
+    return error_errorfromvoicevox(r);
 }
 
 error tts_init(void)
