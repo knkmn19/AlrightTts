@@ -18,8 +18,13 @@ struct audio_drivermeta {
     char name[256];
 };
 
+struct audio_meta {
+    unsigned : 0;
+};
+
 struct audio_engine {
     struct audio_drivermeta drivermeta;
+    struct audio_meta meta;
 
     bool_t bplaying;
     struct tts_pcmdesc pcmdesc;
