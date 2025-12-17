@@ -24,6 +24,14 @@ static error tts_createquery(
     struct VoicevoxSynthesizer*, char const* text, char** ptrq
 );
 
+static error tts_pcmfromquery(
+    char const* q, struct VoicevoxSynthesizer* synth, struct tts_pcmdesc*
+);
+
+static error tts_pcmfromvvwav(
+    struct tts_pcmdesc const wav, struct tts_pcmdesc* pcm
+);
+
 static error error_errorfromvoicevox(VoicevoxResultCode r)
 {
     switch (r) {
@@ -99,6 +107,31 @@ static error tts_createquery(
     *ptrq = o;
     return error_ok;
 }
+
+static error tts_pcmfromquery(
+    char const* q, struct VoicevoxSynthesizer* synth, struct tts_pcmdesc* ptrd
+)
+{
+    error e;
+    VoicevoxResultCode r;
+
+    VoicevoxStyleId const styleid = 14;
+
+    struct tts_pcmdesc wav;
+    r = voicevox_synthesizer_synthesis(
+        synth, q, styleid, voicevox_make_default_synthesis_options(),
+        &wav.sz, &wav.buf
+    );
+    if (r != VOICEVOX_RESULT_OK)
+        return error_errorfromvoicevox(r);
+
+    e = tts_pcmfromvvwav(wav, ptrd);
+    if (e != error_ok)
+        return e;
+
+    return error_fail;
+}
+
 
 error tts_init(void)
 {
