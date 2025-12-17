@@ -13,7 +13,7 @@ extern "C" {
 
 inline static error printerror(char const* where, error e)
 {
-    std::fprintf(stderr, "%s : %s\n", where, ::error_what(e));
+    std::fprintf(stderr, ":%s : %s\n", where, ::error_what(e));
     return e;
 }
 
@@ -137,8 +137,14 @@ static int startkernel(audio_engine* a, tts_engine* tts)
         std::string in = ::strfrominbuf();
 
         tts_pcmdesc d = { };
-        if (e = ::tts_pcmfromutf8(tts, in.c_str(), &d))
+        if (e = ::tts_pcmfromutf8(tts, in.c_str(), &d)) {
+            if (e == error_invalidtextinput) {
+                std::puts(":try again");
+                continue;
+            }
+
             return ::printerror("kernel", e);
+        }
 
         /*
          * its aligned but should still mmake it clear this is an atomic loadd
