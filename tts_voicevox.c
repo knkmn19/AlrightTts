@@ -20,6 +20,10 @@ static error error_errorfromvoicevox(VoicevoxResultCode);
 
 static error tts_voicevox_engine_setupsynthesizer(struct tts_voicevox_engine*);
 
+static error tts_createquery(
+    struct VoicevoxSynthesizer*, char const* text, char** ptrq
+);
+
 static error error_errorfromvoicevox(VoicevoxResultCode r)
 {
     switch (r) {
@@ -78,6 +82,22 @@ deletemodel:
 
 ret:
     return error_errorfromvoicevox(r);
+}
+
+static error tts_createquery(
+    struct VoicevoxSynthesizer* synth, char const* text, char** ptrq
+)
+{
+    VoicevoxResultCode r;
+    char* o;
+
+    VoicevoxStyleId const styleid = 14;
+    r = voicevox_synthesizer_create_audio_query(synth, text, styleid, &o);
+    if (r != VOICEVOX_RESULT_OK)
+        return error_errorfromvoicevox(r);
+
+    *ptrq = o;
+    return error_ok;
 }
 
 error tts_init(void)
