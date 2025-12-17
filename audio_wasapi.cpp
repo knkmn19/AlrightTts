@@ -29,6 +29,15 @@ namespace {
     template<typename T>
     void writeandwake(T& where, T const);
 
+    static inline error error_errorfromhr(long hr)
+    {
+        switch (hr) {
+        default:
+            break;
+        }
+        return error_fail;
+    }
+
 namespace wasapi {
 
     using MM_DEVICE_ENUMERATOR    = IMMDeviceEnumerator;
